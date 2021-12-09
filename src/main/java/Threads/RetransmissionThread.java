@@ -10,7 +10,10 @@ public class RetransmissionThread implements Runnable {
     private Boolean isAlive = Boolean.TRUE;
     private final String logTag;
 
-    public RetransmissionThread(PublisherMessageThread publisherMessageThread, Long retransmissionTimeout, String message, String logTag) {
+    public RetransmissionThread(PublisherMessageThread publisherMessageThread,
+                                Long retransmissionTimeout,
+                                String message,
+                                String logTag) {
         this.publisherMessageThread = publisherMessageThread;
         this.retransmissionTimeout = retransmissionTimeout;
         this.message = message;

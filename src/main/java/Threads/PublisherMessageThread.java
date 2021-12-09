@@ -17,8 +17,8 @@ public class PublisherMessageThread implements Runnable {
     private final String logTag;
 
     public PublisherMessageThread(ZMQ.Context context, String publisherAddress, String logTag) {
-        createPublisherSocket(context, publisherAddress);
         this.logTag = logTag;
+        createPublisherSocket(context, publisherAddress);
         new Thread(this).start();
     }
 
@@ -38,12 +38,12 @@ public class PublisherMessageThread implements Runnable {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        log.info(logTag + "Created Publisher socket with address:\t" + publisherAddress);
+        log.debug(logTag + "Created Publisher socket with address:\t" + publisherAddress);
     }
 
     @Override
     public void run() {
-        log.info(logTag + "Publisher Thread Created!");
+        log.debug(logTag + "Publisher Thread Created!");
         while (!Thread.currentThread().isInterrupted()) {
             handleMessagesToSend();
         }

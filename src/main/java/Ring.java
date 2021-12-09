@@ -13,7 +13,9 @@ public class Ring {
             ports.add(String.valueOf(55000 + i));
         }
         for (int i = 0; i < nodeCount; i++) {
-            new Node(localHostAddress + ports.get(i % nodeCount), localHostAddress + ports.get((i + 1) % nodeCount), i == 0);
+            new Node(localHostAddress + ports.get(i % nodeCount),
+                    localHostAddress + ports.get((i + 1) % nodeCount),
+                    i == 0);
         }
     }
 

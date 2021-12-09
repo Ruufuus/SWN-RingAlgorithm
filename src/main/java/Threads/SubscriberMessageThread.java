@@ -17,8 +17,8 @@ public class SubscriberMessageThread implements Runnable {
     private final String logTag;
 
     public SubscriberMessageThread(ZMQ.Context context, String subscriberAddress, String logTag) {
-        createSubscriberSocket(context, subscriberAddress);
         this.logTag = logTag;
+        createSubscriberSocket(context, subscriberAddress);
         new Thread(this).start();
     }
 
@@ -49,13 +49,13 @@ public class SubscriberMessageThread implements Runnable {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        log.info(logTag + "Created Subscriber socket with address:\t" + subscriberAddress);
+        log.debug(logTag + "Created Subscriber socket with address:\t" + subscriberAddress);
     }
 
 
     @Override
     public void run() {
-        log.info(logTag + "Subscriber Thread Created!");
+        log.debug(logTag + "Subscriber Thread Created!");
         while (!Thread.currentThread().isInterrupted()) {
             String message = this.subscriberSocket.recvStr();
             synchronized (this.messageBuffer) {

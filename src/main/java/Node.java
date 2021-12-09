@@ -21,7 +21,8 @@ public class Node implements Runnable {
 
     public Node(String publisherAddress, String subscriberAddress, boolean initializeToken) throws IOException {
         logTag = publisherAddress + "\t|\t";
-        log.info(logTag + "Created node with:\npublisher Address:\t" + publisherAddress + "\nsubscriber Address:\t" + subscriberAddress);
+        log.info(logTag + "Created node with:\n\t\t\t\t\t\tpublisher Address:\t"
+                + publisherAddress + "\n\t\t\t\t\t\tsubscriber Address:\t" + subscriberAddress);
         ZMQ.Context context = ZMQ.context(1);
         this.initializeToken = initializeToken;
         subscriberMessageThread = new SubscriberMessageThread(context, subscriberAddress, logTag);
@@ -46,7 +47,6 @@ public class Node implements Runnable {
         long receivedTokenId = 0;
         RetransmissionThread retransmissionThread = null;
         try {
-            Thread.sleep(6000l);
             while (!Thread.currentThread().isInterrupted()) {
                 retransmissionThread = handleIfTokenIsThere(receivedTokenId, retransmissionThread);
                 receivedTokenId = Long.parseLong(subscriberMessageThread.readMessage());
@@ -57,9 +57,10 @@ public class Node implements Runnable {
         }
     }
 
-    private RetransmissionThread handleIfTokenIsThere(long receivedTokenId, RetransmissionThread retransmissionThread) throws InterruptedException {
+    private RetransmissionThread handleIfTokenIsThere(long receivedTokenId,
+                                                      RetransmissionThread retransmissionThread) throws InterruptedException {
         if (initializeToken || receivedTokenId > this.tokenId) {
-            log.info("Received new token with id = " + receivedTokenId);
+            log.info(logTag + "Received new token with id = " + receivedTokenId);
             if (retransmissionThread != null) {
                 retransmissionThread.turnOff();
             }
@@ -68,7 +69,8 @@ public class Node implements Runnable {
             log.info(logTag + "Entering Critical Section!");
             Thread.sleep(processingTime);
             log.debug(logTag + "Leaving Critical Section!");
-            retransmissionThread = new RetransmissionThread(publisherMessageThread, retransmissionTimeout, String.valueOf(tokenId), logTag);
+            retransmissionThread = new RetransmissionThread(publisherMessageThread,
+                    retransmissionTimeout, String.valueOf(tokenId), logTag);
         }
         return retransmissionThread;
     }
