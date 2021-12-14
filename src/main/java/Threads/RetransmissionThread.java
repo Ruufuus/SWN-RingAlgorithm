@@ -7,8 +7,8 @@ public class RetransmissionThread implements Runnable {
     private final PublisherMessageThread publisherMessageThread;
     private final Long retransmissionTimeout;
     private final String message;
-    private Boolean isAlive = Boolean.TRUE;
     private final String logTag;
+    private Boolean isAlive = Boolean.TRUE;
 
     public RetransmissionThread(PublisherMessageThread publisherMessageThread,
                                 Long retransmissionTimeout,

@@ -6,18 +6,19 @@ import org.zeromq.ZMQ;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Properties;
 
 @Slf4j
 public class Node implements Runnable {
 
-    private long tokenId = 0;
     private final SubscriberMessageThread subscriberMessageThread;
     private final PublisherMessageThread publisherMessageThread;
+    private final String logTag;
+    private long tokenId = 0;
     private Long processingTime;
     private Long retransmissionTimeout;
     private boolean initializeToken;
-    private final String logTag;
 
     public Node(String publisherAddress, String subscriberAddress, boolean initializeToken) throws IOException {
         logTag = publisherAddress + "\t|\t";
@@ -33,9 +34,9 @@ public class Node implements Runnable {
 
     private void handleProperties() throws IOException {
         Properties nodeProps = new Properties();
-        nodeProps.load(new FileInputStream(Thread.currentThread()
+        nodeProps.load(new FileInputStream(Objects.requireNonNull(Thread.currentThread()
                 .getContextClassLoader()
-                .getResource("config.properties")
+                .getResource("config.properties"))
                 .getPath()));
         processingTime = Long.valueOf(nodeProps.getProperty("processingTime"));
         retransmissionTimeout = Long.valueOf(nodeProps.getProperty("retransmissionTimeout"));
@@ -66,7 +67,7 @@ public class Node implements Runnable {
             }
             tokenId = receivedTokenId + 1;
             initializeToken = false;
-            log.info(logTag + "Entering Critical Section!");
+            log.debug(logTag + "Entering Critical Section!");
             Thread.sleep(processingTime);
             log.debug(logTag + "Leaving Critical Section!");
             retransmissionThread = new RetransmissionThread(publisherMessageThread,

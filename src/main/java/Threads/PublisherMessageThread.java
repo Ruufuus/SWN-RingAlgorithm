@@ -11,10 +11,9 @@ import java.util.List;
 @Slf4j
 public class PublisherMessageThread implements Runnable {
 
-    @Getter
-    public List<String> messageBuffer = new ArrayList<>();
-    private ZMQ.Socket publisherSocket;
     private final String logTag;
+    private final List<String> messageBuffer = new ArrayList<>();
+    private ZMQ.Socket publisherSocket;
 
     public PublisherMessageThread(ZMQ.Context context, String publisherAddress, String logTag) {
         this.logTag = logTag;

@@ -11,15 +11,27 @@ import java.util.List;
 @Slf4j
 public class SubscriberMessageThread implements Runnable {
 
-    @Getter
-    public List<String> messageBuffer = new ArrayList<>();
-    private ZMQ.Socket subscriberSocket;
     private final String logTag;
+    private final List<String> messageBuffer = new ArrayList<>();
+    private ZMQ.Socket subscriberSocket;
 
     public SubscriberMessageThread(ZMQ.Context context, String subscriberAddress, String logTag) {
         this.logTag = logTag;
         createSubscriberSocket(context, subscriberAddress);
         new Thread(this).start();
+    }
+
+
+    private void createSubscriberSocket(ZMQ.Context context, String subscriberAddress) {
+        this.subscriberSocket = context.socket(SocketType.SUB);
+        subscriberSocket.connect("tcp://" + subscriberAddress);
+        subscriberSocket.subscribe(ZMQ.SUBSCRIPTION_ALL);
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        log.debug(logTag + "Created Subscriber socket with address:\t" + subscriberAddress);
     }
 
     public String readMessage() {
@@ -38,18 +50,6 @@ public class SubscriberMessageThread implements Runnable {
             log.debug(logTag + "Read message from buffer:\t" + readMessage);
         }
         return readMessage;
-    }
-
-    private void createSubscriberSocket(ZMQ.Context context, String subscriberAddress) {
-        this.subscriberSocket = context.socket(SocketType.SUB);
-        subscriberSocket.connect("tcp://" + subscriberAddress);
-        subscriberSocket.subscribe(ZMQ.SUBSCRIPTION_ALL);
-        try {
-            Thread.sleep(200);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        log.debug(logTag + "Created Subscriber socket with address:\t" + subscriberAddress);
     }
 
 
