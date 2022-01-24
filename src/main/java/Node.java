@@ -6,6 +6,7 @@ import org.zeromq.ZMQ;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Properties;
 
@@ -46,10 +47,10 @@ public class Node implements Runnable {
     public void run() {
         log.info(logTag + "Node thread created !");
         long receivedTokenId = 0;
-        RetransmissionThread retransmissionThread = null;
+        ArrayList<RetransmissionThread> retransmissionThreads = new ArrayList<>();
         try {
             while (!Thread.currentThread().isInterrupted()) {
-                retransmissionThread = handleIfTokenIsThere(receivedTokenId, retransmissionThread);
+                handleIfTokenIsThere(receivedTokenId, retransmissionThreads);
                 receivedTokenId = Long.parseLong(subscriberMessageThread.readMessage());
             }
 
@@ -58,21 +59,22 @@ public class Node implements Runnable {
         }
     }
 
-    private RetransmissionThread handleIfTokenIsThere(long receivedTokenId,
-                                                      RetransmissionThread retransmissionThread) throws InterruptedException {
+    private void handleIfTokenIsThere(long receivedTokenId,
+                                      ArrayList<RetransmissionThread> retransmissionThreads) throws InterruptedException {
         if (initializeToken || receivedTokenId > this.tokenId) {
             log.info(logTag + "Received new token with id = " + receivedTokenId);
-            if (retransmissionThread != null) {
-                retransmissionThread.turnOff();
-            }
             tokenId = receivedTokenId + 1;
             initializeToken = false;
-            log.debug(logTag + "Entering Critical Section!");
+            log.info(logTag + "Entering Critical Section!");
+            for (RetransmissionThread retransmissionThread:
+                    retransmissionThreads) {
+                retransmissionThread.turnOff();
+            }
             Thread.sleep(processingTime);
-            log.debug(logTag + "Leaving Critical Section!");
-            retransmissionThread = new RetransmissionThread(publisherMessageThread,
-                    retransmissionTimeout, String.valueOf(tokenId), logTag);
+            log.info(logTag + "Leaving Critical Section!");
+            retransmissionThreads.clear();
+            retransmissionThreads.add(new RetransmissionThread(publisherMessageThread,
+                    retransmissionTimeout, String.valueOf(tokenId), logTag));
         }
-        return retransmissionThread;
     }
 }

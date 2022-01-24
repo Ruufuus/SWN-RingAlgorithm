@@ -29,7 +29,7 @@ public class RetransmissionThread implements Runnable {
     @Override
     public void run() {
         log.debug(logTag + "Retransmission Thread created!");
-        while (isAlive || !Thread.currentThread().isInterrupted()) {
+        while (isAlive && !Thread.currentThread().isInterrupted()) {
             publisherMessageThread.sendMessage(this.message);
             log.debug(logTag + "Retransmissioned message:\t" + message);
             try {
